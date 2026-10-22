@@ -47,13 +47,15 @@ invoked skill. Never guess a cache version or search another installed copy.
 Review targets and generated artifacts belong to the user's workspace, not the
 plugin cache. Pass absolute resource and target paths to each reviewer.
 
-Personas and standards live in the plugin cache, outside the project. Reading
-them is not pre-approved: in an interactive session each read prompts the user,
-and in a headless session with no permission rules the read fails and the
-reviewer reports an incomplete review. For headless runs pass
-`--allowedTools Read,Grep,Glob` or add equivalent `permissions.allow` rules
-for the plugin root. Approve these prompts in interactive sessions; a
-reviewer that cannot read its persona or standard has not reviewed.
+Personas and standards live in the plugin cache, outside the project. A
+`PreToolUse` hook in `.claude-plugin/plugin.json` approves `Read`, `Grep`, and
+`Glob` calls inside the plugin's `agents/`, `docs/`, `resources/`, and
+`skills/` folders only, so reviewers read them with no permission rules, also
+in headless runs and background subagents. Other paths get the normal
+permission rules, and deny and ask rules still apply to plugin paths. Where
+plugin hooks do not run (Claude Cowork, or `disableAllHooks`), approve the read
+prompts, or for headless runs pass `--allowedTools Read,Grep,Glob`. A reviewer
+that cannot read its persona or standard has not reviewed.
 
 ## Reviewer isolation
 

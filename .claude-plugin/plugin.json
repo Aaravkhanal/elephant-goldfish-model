@@ -18,5 +18,18 @@
     "./.claude-plugin/agents/style.md",
     "./.claude-plugin/agents/synthesizer.md",
     "./.claude-plugin/agents/zoom_out.md"
-  ]
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/allow_plugin_reads.sh\""
+          }
+        ]
+      }
+    ]
+  }
 }

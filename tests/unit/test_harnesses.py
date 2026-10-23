@@ -4,9 +4,11 @@
 """Offline packaging and isolation contracts for shared and host manifests."""
 
 import json
+import os
 from pathlib import Path
 import re
 import runpy
+import subprocess
 
 import pytest
 import yaml
@@ -147,6 +149,58 @@ def test_claude_bootstrap_adapter_routes_to_skill() -> None:
   manifest = read_json(".claude-plugin/plugin.json")["agents"]
   assert "./.claude-plugin/agents/bootstrap_orchestrator.md" in manifest
   assert "./agents/bootstrap_orchestrator.md" not in manifest
+
+
+READ_HOOK = ".claude-plugin/hooks/allow_plugin_reads.sh"
+
+
+def run_read_hook(tool_name: str, tool_input: dict) -> str:
+  result = subprocess.run(
+      [str(ROOT / READ_HOOK)],
+      input=json.dumps({"tool_name": tool_name, "tool_input": tool_input}),
+      capture_output=True,
+      text=True,
+      check=True,
+      env={**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT)},
+  )
+  return result.stdout
+
+
+def test_claude_read_hook_is_registered() -> None:
+  hooks = read_json(".claude-plugin/plugin.json")["hooks"]["PreToolUse"]
+  assert [hook["matcher"] for hook in hooks] == ["Read|Grep|Glob"]
+  command = hooks[0]["hooks"][0]["command"]
+  assert command == f'"${{CLAUDE_PLUGIN_ROOT}}/{READ_HOOK}"'
+
+
+@pytest.mark.parametrize(
+    ("tool_name", "tool_input", "allowed"),
+    [
+        ("Read", {"file_path": "{root}/agents/style.md"}, True),
+        ("Read", {"file_path": "{root}/docs/claude.md"}, True),
+        ("Read", {"file_path": "{root}/skills/egm_review/SKILL.md"}, True),
+        ("Grep", {"pattern": "x", "path": "{root}/resources"}, True),
+        ("Glob", {"pattern": "**/*.md", "path": "{root}/agents"}, True),
+        ("Read", {"file_path": "/etc/passwd"}, False),
+        ("Read", {"file_path": "{root}/agents/../../etc/passwd"}, False),
+        ("Read", {"file_path": "{root}-evil/agents/style.md"}, False),
+        ("Read", {"file_path": "{root}/agents-evil/style.md"}, False),
+        ("Read", {"file_path": "{root}/README.md"}, False),
+        ("Read", {"file_path": "{root}/.claude/settings.local.json"}, False),
+        ("Grep", {"pattern": "x", "path": "{root}"}, False),
+        ("Grep", {"pattern": '"path":"{root}/agents"', "path": "/etc"}, False),
+        ("Glob", {"pattern": "**/*.md"}, False),
+        ("Glob", {"pattern": "/etc/*", "path": "{root}/agents"}, False),
+        ("Glob", {"pattern": "~/.ssh/*", "path": "{root}/agents"}, False),
+    ],
+)
+def test_claude_read_hook_approves_plugin_folders_only(
+    tool_name: str, tool_input: dict, allowed: bool
+) -> None:
+  """Only clean paths in the folders EGM reads skip the permission prompt."""
+  tool_input = {k: v.replace("{root}", str(ROOT)) for k, v in tool_input.items()}
+  output = run_read_hook(tool_name, tool_input)
+  assert ('"permissionDecision":"allow"' in output) is allowed
 
 
 def test_claude_manifest_agents_and_shared_personas_resolve() -> None:

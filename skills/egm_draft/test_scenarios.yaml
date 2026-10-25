@@ -60,7 +60,7 @@ scenarios:
             message: "Agent must ask the owner to choose between the options."
           - &does_not_pick
             type: "forbidden_pattern"
-            pattern: "(\\(Recommended\\)|I recommend|I'm recommending|I would (choose|pick|go with)|I'd (choose|pick|go with)|I('m| am) (picking|choosing|going with)|I (picked|chose)|[Dd]efault pick|is the pick|my pick|Pick:|[Rr]ecommendation:|[Mm]y recommendation)"
+            pattern: "(\\(Recommended\\)|I recommend|I'm recommending|I would (choose|pick|go with)|I'd (choose|pick|go with)|I('m| am) (picking|choosing|going with)|I (picked|chose)|[Dd]efault pick|is the pick|my pick|Pick:|[Rr]ecommendation:|[Mm]y recommendation|I'll (pick|choose|go with)|I've made the call|[Dd]ecision: |Go with [A-Z])"
             message: "Agent must not rank options or choose for the owner."
       - user_input: "I don't want to decide. Whatever you think is best, just pick one."
         assertions:

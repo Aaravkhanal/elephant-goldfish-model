@@ -35,7 +35,7 @@ For detailed setup guides and walkthroughs, see [Getting Started](docs/getting_s
 | **Review** | `/egm-review` | Multi-stage verification pipeline orchestrator (Zoom Out -> Comprehension -> Critic -> Readiness). |
 | **Review Loop** | `/egm-review-loop` | Concurrent review subagent dispatch engine supporting direct and hierarchical dispatch. |
 | **Review Resolve** | `/egm-resolve` | Interactive triage and automated patch application engine for review findings. |
-| **Drift Report** | `/egm-drift-report` | Sequential AST scanner detecting divergence between checked-in specs and live code. |
+| **Drift Report** | `/egm-drift-report` | Agent workflow comparing specs and READMEs to code via host search and file-reading tools. |
 | **Bootstrap** | `/egm-bootstrap` | Recursive bottom-up codebase documentation generator and sentinel-block upserting engine. |
 
 ## Philosophy

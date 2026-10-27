@@ -43,7 +43,7 @@ codex plugin marketplace add google/elephant-goldfish-model
 codex plugin add egm@egm
 ```
 
-Start a new session after installation. For **Claude Cowork** and **ChatGPT Work**, see the [setup and support guide](docs/harnesses.md).
+Start a new session after installation. For **Claude Cowork** and **ChatGPT Work**, see the [setup guide](docs/harnesses.md).
 
 ## Try your first design
 
@@ -99,20 +99,20 @@ You can use each skill when you need it. You do not have to follow the full sequ
 <table>
   <thead><tr><th colspan="2" align="left">Skill</th><th align="left">Use it to…</th></tr></thead>
   <tbody>
-    <tr><td align="center" valign="middle"><img src="skills/egm_brainstorm/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_brainstorm/SKILL.md">Brainstorm</a></td><td>Test an idea and write a concept brief.</td></tr>
-    <tr><td align="center" valign="middle"><img src="skills/egm_draft/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_draft/SKILL.md">Draft</a></td><td>Turn a brief or existing notes into a design document.</td></tr>
-    <tr><td align="center" valign="middle"><img src="skills/egm_resolve/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_resolve/SKILL.md">Resolve</a></td><td>Work through review findings and agree on changes.</td></tr>
-    <tr><td align="center" valign="middle"><img src="skills/egm_bootstrap/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_bootstrap/SKILL.md">Bootstrap</a></td><td>Create or update documentation for an existing codebase.</td></tr>
-    <tr><td align="center" valign="middle"><img src="skills/egm_review/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_review/SKILL.md">Review</a></td><td>Review a design with fresh agents across five stages.</td></tr>
-    <tr><td align="center" valign="middle"><img src="skills/egm_review_loop/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_review_loop/SKILL.md">Review&nbsp;loop</a></td><td>Run a configured group of reviewers for a specific review task.</td></tr>
-    <tr><td align="center" valign="middle"><img src="skills/egm_drift_report/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_drift_report/SKILL.md">Drift&nbsp;report</a></td><td>Compare checked-in documents with the current source code.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_brainstorm/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_brainstorm/SKILL.md">Brainstorm</a></td><td>Test an idea and write a concept brief.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_draft/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_draft/SKILL.md">Draft</a></td><td>Turn a brief or existing notes into a design document.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_resolve/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_resolve/SKILL.md">Resolve</a></td><td>Work through review findings and agree on changes.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_bootstrap/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_bootstrap/SKILL.md">Bootstrap</a></td><td>Create or update documentation for an existing codebase.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_review/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_review/SKILL.md">Review</a></td><td>Review a design with fresh agents across five stages.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_review_loop/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_review_loop/SKILL.md">Review&nbsp;loop</a></td><td>Run a configured group of reviewers for a specific review task.</td></tr>
+    <tr><td width="48" align="center" valign="middle"><img src="skills/egm_drift_report/assets/icon.svg" width="20" height="20" alt=""></td><td valign="middle"><a href="skills/egm_drift_report/SKILL.md">Drift&nbsp;report</a></td><td>Compare checked-in documents with the current source code.</td></tr>
   </tbody>
 </table>
 
 ## Learn more
 
 - [Getting started](docs/getting_started.md): the workflow and project layout.
-- [Setup and support](docs/harnesses.md): installation, agent capabilities, and known limits.
+- [Setup](docs/harnesses.md): installation, agent capabilities, and known limits.
 - [Architecture](https://github.com/google/elephant-goldfish-model/blob/main/docs/designs/architecture.md): how the skills and reviewers fit together.
 - [Testing](https://github.com/google/elephant-goldfish-model/blob/main/TESTING.md): checks, execution records, and verification limits.
 - [Dave Rensin’s original essay](https://medium.com/@drensin/elephants-goldfish-and-the-new-golden-age-of-software-engineering-c33641a48874): the ideas behind EGM.

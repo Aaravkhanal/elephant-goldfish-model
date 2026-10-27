@@ -69,11 +69,11 @@ The agent turns the brief into `design_draft.md`, pausing after each section for
 
 <img src="skills/egm_review/assets/icon.svg" width="20" height="20" align="top" alt=""> **Review the draft**
 
-Use the draft path returned by the agent, for example:
-
 ```text
 /egm-review design_draft.md
 ```
+
+Use the draft path returned by the agent.
 
 Fresh reviewers check the design, its clarity, its fit with the code, and its implementation plan. Choose which findings to address. When you approve the design, ask your coding agent to implement it.
 

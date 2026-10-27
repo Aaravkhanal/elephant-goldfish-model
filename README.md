@@ -119,7 +119,7 @@ You can use each skill when you need it. You do not have to follow the full sequ
 
 ## Contribute
 
-See the [contribution guide](https://github.com/google/elephant-goldfish-model/blob/main/CONTRIBUTING.md) before opening a PR. Use [issues](https://github.com/google/elephant-goldfish-model/issues) for bugs and [discussions](https://github.com/google/elephant-goldfish-model/discussions) for questions and ideas.
+See [contributing](https://github.com/google/elephant-goldfish-model/blob/main/CONTRIBUTING.md) before opening a PR. Use [issues](https://github.com/google/elephant-goldfish-model/issues) for bugs and [discussions](https://github.com/google/elephant-goldfish-model/discussions) for questions and ideas.
 
 ## License
 

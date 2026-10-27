@@ -98,13 +98,13 @@ You can use each skill when you need it. You do not have to follow the full sequ
 
 | Skill | Use it to… |
 | :--- | :--- |
-| <img src="skills/egm_brainstorm/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Brainstorm](skills/egm_brainstorm/SKILL.md) | Test an idea and write a concept brief. |
-| <img src="skills/egm_draft/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Draft](skills/egm_draft/SKILL.md) | Turn a brief or existing notes into a design document. |
-| <img src="skills/egm_review/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Review](skills/egm_review/SKILL.md) | Review a design with fresh agents across five stages. |
-| <img src="skills/egm_resolve/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Resolve](skills/egm_resolve/SKILL.md) | Work through review findings and agree on changes. |
-| <img src="skills/egm_drift_report/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Drift report](skills/egm_drift_report/SKILL.md) | Compare checked-in documents with the current source code. |
-| <img src="skills/egm_bootstrap/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Bootstrap](skills/egm_bootstrap/SKILL.md) | Create or update documentation for an existing codebase. |
-| <img src="skills/egm_review_loop/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Review loop](skills/egm_review_loop/SKILL.md) | Run a configured group of reviewers for a specific review task. |
+| <img src="skills/egm_brainstorm/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Brainstorm](skills/egm_brainstorm/SKILL.md) | Test an idea and write a concept brief. |
+| <img src="skills/egm_draft/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Draft](skills/egm_draft/SKILL.md) | Turn a brief or existing notes into a design document. |
+| <img src="skills/egm_review/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Review](skills/egm_review/SKILL.md) | Review a design with fresh agents across five stages. |
+| <img src="skills/egm_resolve/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Resolve](skills/egm_resolve/SKILL.md) | Work through review findings and agree on changes. |
+| <img src="skills/egm_drift_report/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Drift&nbsp;report](skills/egm_drift_report/SKILL.md) | Compare checked-in documents with the current source code. |
+| <img src="skills/egm_bootstrap/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Bootstrap](skills/egm_bootstrap/SKILL.md) | Create or update documentation for an existing codebase. |
+| <img src="skills/egm_review_loop/assets/icon.svg" width="24" height="24" align="middle" alt="">&nbsp;[Review&nbsp;loop](skills/egm_review_loop/SKILL.md) | Run a configured group of reviewers for a specific review task. |
 
 ## Learn more
 

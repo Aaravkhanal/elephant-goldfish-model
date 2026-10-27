@@ -54,14 +54,14 @@ def test_runtime_bundle_is_complete_and_reproducible(
     assert len([p for p in names if p.endswith("/SKILL.md")]) == 7
     for skill in source.glob("skills/*/SKILL.md"):
       prefix = skill.parent.relative_to(source)
-      metadata = yaml.safe_load(bundle.read(str(prefix / "agents/openai.yaml")))
+      metadata = yaml.safe_load(bundle.read((prefix / "agents/openai.yaml").as_posix()))
       interface = metadata["interface"]
       assert interface["display_name"]
       assert 25 <= len(interface["short_description"]) <= 64
       for field in ("icon_small", "icon_large"):
         icon = Path(interface[field])
         assert not icon.is_absolute() and ".." not in icon.parts
-        data = bundle.read(str(prefix / icon))
+        data = bundle.read((prefix / icon).as_posix())
         assert data == (skill.parent / icon).read_bytes()
         assert ElementTree.fromstring(data).tag == "{http://www.w3.org/2000/svg}svg"
     assert "skills/egm_bootstrap/references/worker-return.schema.json" in names
@@ -246,18 +246,20 @@ def test_rejects_dangling_output_symlinks(
 
 
 @pytest.mark.parametrize("target", ["claude", "openai"])
-@pytest.mark.parametrize("symlink", [False, True])
+@pytest.mark.parametrize("claim", ["file", "dangling-symlink", "symlink"])
 def test_archive_claimed_after_preflight_is_not_overwritten(
     source: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
-    target: str, symlink: bool,
+    target: str, claim: str,
 ) -> None:
   output = tmp_path / "output"
   archive = output / f"egm-{target}.zip"
   outside = tmp_path / "outside.zip"
+  if claim == "symlink":
+    outside.write_bytes(b"outside file must not change")
   original_zipfile = zipfile.ZipFile
 
   def claim_archive(*args, **kwargs):
-    if symlink:
+    if claim != "file":
       archive.symlink_to(outside)
     else:
       archive.write_bytes(b"another build owns this file")
@@ -266,11 +268,15 @@ def test_archive_claimed_after_preflight_is_not_overwritten(
   monkeypatch.setattr(zipfile, "ZipFile", claim_archive)
   with pytest.raises(FileExistsError):
     build(source, target, output)
-  if symlink:
+  if claim != "file":
     assert archive.is_symlink()
-    assert not outside.exists()
+    if claim == "symlink":
+      assert outside.read_bytes() == b"outside file must not change"
+    else:
+      assert not outside.exists()
   else:
     assert archive.read_bytes() == b"another build owns this file"
+  assert not list(output.glob(".egm-*"))
 
 
 def test_published_claude_runtime_is_current(tmp_path: Path) -> None:

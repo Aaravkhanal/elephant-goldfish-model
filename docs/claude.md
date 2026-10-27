@@ -29,6 +29,10 @@ in chat; the model reads the draft again before each revision.
 Write briefs, drafts, and reports to the user's working directory. The
 per-session scratchpad is not the artifact directory: it belongs to one
 session, and the deliverables must outlive it.
+If the user's prompt or agent instructions file (`CLAUDE.md` or `AGENTS.md`)
+has a line `EGM artifact directory: <path>`, write them to that folder instead:
+resolve a relative path against the working directory, and create the folder if
+it does not exist.
 In Claude Code, `egm:egm-synthesizer` may spawn reviewers (nesting is allowed
 up to 3 levels by default), or the main context may dispatch reviewers directly.
 In Claude Cowork, subagents cannot spawn further subagents, so dispatch
@@ -47,15 +51,29 @@ invoked skill. Never guess a cache version or search another installed copy.
 Review targets and generated artifacts belong to the user's workspace, not the
 plugin cache. Pass absolute resource and target paths to each reviewer.
 
-Personas and standards live in the plugin cache, outside the project. A
-`PreToolUse` hook in `.claude-plugin/plugin.json` approves `Read`, `Grep`, and
-`Glob` calls inside the plugin's `agents/`, `docs/`, `resources/`, and
-`skills/` folders only, so reviewers read them with no permission rules, also
-in headless runs and background subagents. Other paths get the normal
-permission rules, and deny and ask rules still apply to plugin paths. Where
-plugin hooks do not run (Claude Cowork, or `disableAllHooks`), approve the read
-prompts, or for headless runs pass `--allowedTools Read,Grep,Glob`. A reviewer
-that cannot read its persona or standard has not reviewed.
+Personas and standards live in the plugin cache, outside the project. EGM
+does not install a permission-approval hook. Approve resource reads through
+Claude Code's normal permission prompts; current versions can surface background
+reviewer prompts in the parent session. For headless runs, the user must grant
+read access to the resolved plugin's `agents/`, `docs/`, `resources/`, and
+`skills/` folders using Claude Code's permission settings. Keep write access
+limited to the project and intended output directory. Do not disable permission
+checks or grant access to every installed plugin. A reviewer that cannot read
+its persona or standard must report the limitation and stop; it has not reviewed.
+
+For example, after resolving the actual installed plugin directory, add only
+its resource folders to user-approved read rules in `/permissions`:
+
+```text
+Read(//absolute/plugin/path/agents/**)
+Read(//absolute/plugin/path/docs/**)
+Read(//absolute/plugin/path/resources/**)
+Read(//absolute/plugin/path/skills/**)
+```
+
+Replace the example path; do not copy a guessed cache location. These read rules
+also cover Grep and Glob on those files on a best-effort basis. Adding a directory
+with `--add-dir` extends edit access too, so it is not a read-only substitute.
 
 ## Claude Code Warning: Default agents/ folder is ignored
 
@@ -65,13 +83,21 @@ In Claude Code (`/plugin` > Errors), you may see the following advisory warning:
 Default agents/ folder is ignored because the manifest sets "agents"
 ```
 
-**This warning is expected and completely harmless.**
+This specific advisory is expected with EGM's explicit adapter list. It does not
+mean the registered adapters failed to load; investigate other errors separately.
 
 EGM maintains two agent directories:
 1. `agents/`: Contains canonical, harness-agnostic reviewer persona markdown prompts loaded by Antigravity and other harnesses.
-2. `.claude-plugin/agents/`: Contains specialized Claude Code adapters that enforce zero-context isolation (`omitClaudeMd: true`) and strict read-only tool limits (`tools: [Read, Grep, Glob]`).
+2. `.claude-plugin/agents/`: Contains Claude Code adapters. Reviewer adapters use
+   `omitClaudeMd: true` and `tools: [Read, Grep, Glob]`; the synthesizer and bootstrap
+   orchestrator have their own tool lists, described below.
 
-Because `.claude-plugin/plugin.json` explicitly declares the `.claude-plugin/agents/` adapters in its `"agents"` field, Claude Code skips auto-loading the root `agents/` folder. This is intentional: removing `"agents"` would auto-load `agents/` without read-only restrictions (granting reviewers file-modification and shell permissions), while listing both folders would create duplicate subagent registrations under the same names. Do not modify the manifest to silence this notice.
+Because `.claude-plugin/plugin.json` explicitly lists the adapters in `"agents"`,
+Claude Code skips auto-loading the root `agents/` folder. The shared personas do
+not declare Claude's read-only tool restrictions. Auto-loading them instead would
+lose the adapter-specific restrictions; available tools would still be subject to
+the host's permissions. Registering both copies would also duplicate reviewer
+names. Keep the explicit adapter list rather than removing it to silence this notice.
 
 ## Reviewer isolation
 
@@ -88,9 +114,11 @@ Reviewers cannot edit files or run shell commands, and no persistent `memory`
 is configured. The synthesizer adapter declares
 `tools: [Agent, Read, Grep, Glob, Write]` so it can spawn reviewers and write
 reports but cannot run shell commands or use the session's MCP connectors.
-The bootstrap orchestrator adapter keeps all tools because the bootstrap
-skill uses the shell; it routes workers to the bootstrap `SKILL.md` so they
-return the JSON `subtree_index` instead of prose. The parent handles fixes.
+The bootstrap orchestrator adapter allows only `Agent`, `Bash`, `Read`, `Grep`,
+`Glob`, `Write`, and `Edit` for local discovery and documentation. It routes
+workers to the bootstrap `SKILL.md` so they return the JSON `subtree_index`
+instead of prose. The parent handles fixes. Bash remains subject to normal
+permission rules and is not a filesystem or network sandbox.
 Reviewers cannot open URLs. Do not pass documentation URLs in
 `GoldfishContext` to Claude reviewers: save the raw page as a file in the
 workspace and pass that path instead.

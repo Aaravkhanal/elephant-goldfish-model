@@ -15,7 +15,7 @@
 
 Thousands of Google engineers use EGM, an open-source plugin, to draft specs with deep-context agents and stress-test them with zero-context subagents before writing code.
 
-The **Elephant** holds your project context and drafts the specification. **Goldfish** reviewers examine the draft and referenced source material without the earlier conversation, helping expose unstated assumptions and blind spots. **You** make the architectural trade-offs and approve the specification before implementation.
+**Elephant** holds your project context and drafts the specification. **Goldfish** reviewers examine the draft and referenced source material without the earlier conversation, helping expose unstated assumptions and blind spots. **You** make the architectural trade-offs and approve the specification before implementation.
 
 Use it when a feature needs design decisions before implementation. For a small, clear bug fix, use your normal coding workflow.
 
@@ -51,7 +51,7 @@ Open your project in your coding agent and choose a feature that needs design de
 
 Use the commands below in Antigravity. In Claude Code, use the `/egm:` prefix, for example `/egm:egm-brainstorm`. In Codex, select the corresponding EGM skill from the skill picker. Brainstorming and review require a session that can create fresh subagents.
 
-**1. Explore the idea**
+<img src="skills/egm_brainstorm/assets/icon.svg" width="24" height="24" align="middle" alt=""> **1. Explore the idea**
 
 ```text
 /egm-brainstorm Add webhook delivery to this project.
@@ -59,7 +59,7 @@ Use the commands below in Antigravity. In Claude Code, use the `/egm:` prefix, f
 
 Discuss requirements and trade-offs with the agent. Fresh reviewers challenge the proposal, and the agent saves the agreed direction in `concepts_brief.md`.
 
-**2. Draft the specification**
+<img src="skills/egm_draft/assets/icon.svg" width="24" height="24" align="middle" alt=""> **2. Draft the specification**
 
 ```text
 /egm-draft
@@ -67,7 +67,7 @@ Discuss requirements and trade-offs with the agent. Fresh reviewers challenge th
 
 The agent turns the brief into `design_draft.md`, pausing after each section for your feedback in chat.
 
-**3. Review the draft**
+<img src="skills/egm_review/assets/icon.svg" width="24" height="24" align="middle" alt=""> **3. Review the draft**
 
 Use the draft path returned by the agent, for example:
 
@@ -98,13 +98,13 @@ You can use each skill when you need it. You do not have to follow the full sequ
 
 | Skill | Use it to… |
 | :--- | :--- |
-| [`egm-brainstorm`](skills/egm_brainstorm/SKILL.md) | Test an idea and write a concept brief. |
-| [`egm-draft`](skills/egm_draft/SKILL.md) | Turn a brief or existing notes into a design document. |
-| [`egm-review`](skills/egm_review/SKILL.md) | Review a design with fresh agents across five stages. |
-| [`egm-resolve`](skills/egm_resolve/SKILL.md) | Work through review findings and agree on changes. |
-| [`egm-drift-report`](skills/egm_drift_report/SKILL.md) | Compare checked-in documents with the current source code. |
-| [`egm-bootstrap`](skills/egm_bootstrap/SKILL.md) | Create or update documentation for an existing codebase. |
-| [`egm-review-loop`](skills/egm_review_loop/SKILL.md) | Run a configured group of reviewers for a specific review task. |
+| <img src="skills/egm_brainstorm/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Brainstorm](skills/egm_brainstorm/SKILL.md) | Test an idea and write a concept brief. |
+| <img src="skills/egm_draft/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Draft](skills/egm_draft/SKILL.md) | Turn a brief or existing notes into a design document. |
+| <img src="skills/egm_review/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Review](skills/egm_review/SKILL.md) | Review a design with fresh agents across five stages. |
+| <img src="skills/egm_resolve/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Resolve](skills/egm_resolve/SKILL.md) | Work through review findings and agree on changes. |
+| <img src="skills/egm_drift_report/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Drift report](skills/egm_drift_report/SKILL.md) | Compare checked-in documents with the current source code. |
+| <img src="skills/egm_bootstrap/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Bootstrap](skills/egm_bootstrap/SKILL.md) | Create or update documentation for an existing codebase. |
+| <img src="skills/egm_review_loop/assets/icon.svg" width="24" height="24" align="middle" alt=""> [Review loop](skills/egm_review_loop/SKILL.md) | Run a configured group of reviewers for a specific review task. |
 
 ## Learn more
 
@@ -116,7 +116,7 @@ You can use each skill when you need it. You do not have to follow the full sequ
 
 ## Contribute
 
-Read the [contribution guidelines](https://github.com/google/elephant-goldfish-model/blob/main/CONTRIBUTING.md) before opening a pull request. Use [issues](https://github.com/google/elephant-goldfish-model/issues) for bugs and [discussions](https://github.com/google/elephant-goldfish-model/discussions) for questions and ideas.
+See the [contribution guide](https://github.com/google/elephant-goldfish-model/blob/main/CONTRIBUTING.md) before opening a PR. Use [issues](https://github.com/google/elephant-goldfish-model/issues) for bugs and [discussions](https://github.com/google/elephant-goldfish-model/discussions) for questions and ideas.
 
 ## License
 

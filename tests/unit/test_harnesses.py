@@ -181,7 +181,7 @@ def test_claude_permissions_remain_under_user_control() -> None:
   manifest = read_json(".claude-plugin/plugin.json")
   assert "hooks" not in manifest
   assert not (ROOT / ".claude-plugin/hooks/allow_plugin_reads.sh").exists()
-  assert not (ROOT / "hooks/hooks.json").exists()>>>>>>> f5b8b45 (Prepare runtime packages and permissions for plugin directories)
+  assert not (ROOT / "hooks/hooks.json").exists()
 
 
 def test_claude_manifest_agents_and_shared_personas_resolve() -> None:

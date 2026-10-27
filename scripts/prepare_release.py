@@ -11,7 +11,18 @@ from pack_plugin import build
 
 
 def version_for_tag(root: Path, tag: str) -> str:
-    """Require a normal vMAJOR.MINOR.PATCH tag matching every shipped manifest."""
+    """Returns the tag version after validating all shipped manifests.
+
+    Args:
+        root: Repository root containing the portable and host manifests.
+        tag: Release tag in vMAJOR.MINOR.PATCH format, without leading zeroes.
+
+    Returns:
+        The version without the leading v.
+
+    Raises:
+        ValueError: The tag is invalid or a manifest version does not match it.
+    """
     if not re.fullmatch(r"v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", tag):
         raise ValueError("Tag must be vMAJOR.MINOR.PATCH without leading zeroes")
     version = tag[1:]
@@ -24,9 +35,22 @@ def version_for_tag(root: Path, tag: str) -> str:
 
 
 def prepare(root: Path, tag: str, output: Path, commit: str) -> None:
-    """Build into a new directory; never overwrite a previous candidate."""
+    """Builds runtime archives, checksums, and draft notes in a new directory.
+
+    Args:
+        root: Repository root containing the runtime sources and manifests.
+        tag: Release tag matching every shipped manifest version.
+        output: New destination directory; an existing candidate is never replaced.
+        commit: Caller-declared source identity as 40 lowercase hexadecimal digits.
+            This function does not verify that it identifies the source checkout.
+
+    Raises:
+        ValueError: The tag, manifest versions, commit, or runtime inputs are invalid.
+        FileExistsError: The destination already exists.
+        OSError: Reading sources, building archives, or writing output fails.
+    """
     version = version_for_tag(root, tag)
-    if not re.fullmatch(r"[0-9a-f]{40}", commit):
+    if len(commit) != 40 or any(char not in "0123456789abcdef" for char in commit):
         raise ValueError("Source commit must be a full Git SHA")
     output.mkdir(parents=True, exist_ok=False)
     checksums = []

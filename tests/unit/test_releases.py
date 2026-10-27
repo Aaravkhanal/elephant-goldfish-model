@@ -62,9 +62,13 @@ def test_prepare_exact_archives(release: dict, tmp_path: Path) -> None:
         release["prepare"](ROOT, f"v{version}", destination, commit)
 
 
-def test_reject_invalid_commit_without_writing(release: dict, tmp_path: Path) -> None:
+@pytest.mark.parametrize("commit", ["HEAD", "a" * 39, "a" * 41, "A" * 40,
+                                   "g" * 40, "a" * 39 + "\n", "１" * 40])
+def test_reject_invalid_commit_without_writing(
+    release: dict, tmp_path: Path, commit: str,
+) -> None:
     version = json.loads((ROOT / "plugin.json").read_text())["version"]
     destination = tmp_path / "release"
     with pytest.raises(ValueError, match="Git SHA"):
-        release["prepare"](ROOT, f"v{version}", destination, "HEAD")
+        release["prepare"](ROOT, f"v{version}", destination, commit)
     assert not destination.exists()

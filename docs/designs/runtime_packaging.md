@@ -26,6 +26,22 @@ documentation, licenses, and image assets. Include SVG and PNG files under
 `docs/assets` for README images. Exclude website content, tests, workflows,
 hooks, development marketplace metadata, and unrelated files.
 
+The target inventory is explicit:
+
+- Shared: `plugin.json`, `LICENSE`, `README.md`, `skills/*/SKILL.md`,
+  `skills/*/agents/openai.yaml`, skill assets and references, `agents/*.md`,
+  `resources/*.md`, and `resources/document_standards/*.md`.
+- Shared guides: `docs/index.md`, `docs/getting_started.md`, `docs/harnesses.md`,
+  `docs/claude.md`, `docs/codex.md`, `docs/faq.md`, and `docs/privacy.md`.
+  Include `docs/releases.md` when release preparation adds that guide.
+- Shared images: SVG and PNG files under `assets/` and `docs/assets/`.
+- Claude: `.claude-plugin/plugin.json`, `.claude-plugin/icon.png`, and
+  `.claude-plugin/agents/*.md`.
+- OpenAI: `.codex-plugin/plugin.json`.
+
+The builder's `SHARED`, `HOST`, and `REQUIRED_SHARED` constants implement this
+inventory. Required references must exist; optional files must match these paths.
+
 Keep installation guides, host instructions, personas, skills, and review
 standards in the runtime. Exclude repository design documents, `TESTING.md`,
 `CONTRIBUTING.md`, `AI_POLICY.md`, and the PR template. Link to those development
@@ -53,6 +69,11 @@ Remove the automatic permission-approval hook. Keep bounded tools on Claude
 native adapters. Resource reads use normal host permissions. A denied read
 must stop the affected reviewer without a fabricated verdict.
 
+Read-only Claude reviewers allow `Read`, `Grep`, and `Glob`. The synthesizer
+also allows `Agent` and `Write` for delegation and reports. Bootstrap allows
+`Agent`, `Bash`, `Read`, `Grep`, `Glob`, `Write`, and `Edit` for documentation.
+These tool lists do not establish a filesystem or network sandbox.
+
 Test parent-context isolation separately from filesystem access and host-added
 instructions or memory. A Claude CLI probe does not establish Cowork behavior.
 OpenAI packaging does not establish support for every ChatGPT mode.
@@ -64,7 +85,9 @@ OpenAI packaging does not establish support for every ChatGPT mode.
 - Verify allowed and denied resource reads against the generated runtime.
 - Record the source SHA, installed artifact identity, host/model version,
   and separate installation, workflow, and isolation outcomes.
-- Preserve the evidence gaps tracked in #105 and #106.
+- Preserve the cloud workflow and isolation gaps in
+  [Cowork #105](https://github.com/google/elephant-goldfish-model/issues/105)
+  and [ChatGPT Work #106](https://github.com/google/elephant-goldfish-model/issues/106).
 - Obtain scope approval and merge this design before merging #136.
 - Coordinate tagged artifacts through the [release design](releases.md).
 

@@ -30,6 +30,9 @@ The proposed `scripts/prepare_release.py` accepts `--tag`, `--commit`, and
 
 Local invocation validates the supplied values and builds archives. It does
 not prove Git ancestry or run tests. The workflow owns those checks.
+The local source SHA is a caller declaration, not verified source identity.
+Label that limitation in the generated notes. Publication uses workflow-built
+candidates after source verification and exact-artifact checks.
 
 ## Workflow and permissions
 
@@ -47,6 +50,9 @@ The provenance identifies the workflow dispatched from `main`. Its source
 identity can differ from the selected tag checked out during the job. Release
 notes record the tagged source SHA. Review both identities before publication.
 Attestations establish artifact provenance, not host compatibility or code safety.
+Verification must identify the signing workflow on `refs/heads/main` and the
+downloaded ZIP's digest. Compare the recorded tagged SHA with the tag resolved
+by the build job. Workflow identity alone does not verify that tag mapping.
 
 A separate draft job receives
 the artifacts, verifies their checksums, rechecks tag identity, and creates a
@@ -63,9 +69,12 @@ replacing existing assets. Neither job creates tags or publishes releases.
 5. Dispatch the workflow. Inspect both archives, checksums, and source identity.
    Verify each ZIP with `gh attestation verify FILE --repo google/elephant-goldfish-model`.
    Require the signing workflow `.github/workflows/release.yml` from `main`.
-6. Complete #60 for each claimed host using these exact artifacts. Record
+6. Complete [the exact-bundle verification procedure in #60](https://github.com/google/elephant-goldfish-model/issues/60)
+   for each claimed host using these exact artifacts. Record
    installed-file identity, host/model versions, date, and separate installation,
    workflow, and isolation results.
+   Completion requires clean installation, intended artifact identity, and
+   supported workflow and isolation outcomes. Preserve any partial host result.
 7. Review final release notes and publish manually. Directory approval remains
    separate from release publication.
 

@@ -51,7 +51,7 @@ Open your project in your coding agent and choose a feature that needs design de
 
 Use the commands below in Antigravity. In Claude Code, use the `/egm:` prefix, for example `/egm:egm-brainstorm`. In Codex, select the corresponding EGM skill from the skill picker. Brainstorming and review require a session that can create fresh subagents.
 
-<img src="skills/egm_brainstorm/assets/icon.svg" width="20" height="20" align="top" alt=""> **1. Explore the idea**
+<img src="skills/egm_brainstorm/assets/icon.svg" width="20" height="20" align="top" alt=""> **Explore the idea**
 
 ```text
 /egm-brainstorm Add webhook delivery to this project.
@@ -59,7 +59,7 @@ Use the commands below in Antigravity. In Claude Code, use the `/egm:` prefix, f
 
 Discuss requirements and trade-offs with the agent. Fresh reviewers challenge the proposal, and the agent saves the agreed direction in `concepts_brief.md`.
 
-<img src="skills/egm_draft/assets/icon.svg" width="20" height="20" align="top" alt=""> **2. Draft the specification**
+<img src="skills/egm_draft/assets/icon.svg" width="20" height="20" align="top" alt=""> **Draft the specification**
 
 ```text
 /egm-draft
@@ -67,7 +67,7 @@ Discuss requirements and trade-offs with the agent. Fresh reviewers challenge th
 
 The agent turns the brief into `design_draft.md`, pausing after each section for your feedback in chat.
 
-<img src="skills/egm_review/assets/icon.svg" width="20" height="20" align="top" alt=""> **3. Review the draft**
+<img src="skills/egm_review/assets/icon.svg" width="20" height="20" align="top" alt=""> **Review the draft**
 
 Use the draft path returned by the agent, for example:
 

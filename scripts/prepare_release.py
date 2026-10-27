@@ -38,7 +38,9 @@ def prepare(root: Path, tag: str, output: Path, commit: str) -> None:
         checksums.append(f"{digest}  {destination.name}\n")
     (output / "SHA256SUMS").write_text("".join(checksums), encoding="utf-8")
     (output / "RELEASE_NOTES.md").write_text(
-        f"# EGM {version}\n\nSource: `{commit}`\nTag: `{tag}`\n\n"
+        f"# EGM {version}\n\nDeclared source: `{commit}`\nTag: `{tag}`\n\n"
+        "Local source identity is caller-supplied and is not verified by this script. "
+        "Publish only workflow-built candidates after exact-artifact checks.\n\n"
         "Runtime archives: Claude and OpenAI. Verify downloads with "
         "`sha256sum -c SHA256SUMS`.\n\n"
         "For CI-built candidates, verify each ZIP with "

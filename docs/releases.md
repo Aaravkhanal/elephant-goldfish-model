@@ -38,8 +38,10 @@ For local preparation, use a fresh output directory:
 python scripts/prepare_release.py --tag v0.1.0 --commit "$(git rev-parse HEAD)" --output /tmp/egm-0.1.0-candidate
 ```
 
-The local command checks manifest versions and builds artifacts; it does not
-verify Git tag ancestry or run tests. Those checks belong to the workflow.
+The local command checks manifest versions and builds artifacts. It does not
+verify the caller-supplied source SHA, Git tag ancestry, or tests. Those checks
+belong to the workflow. Publish only workflow-built candidates after
+exact-artifact checks. Local builds remain diagnostic candidates.
 Exact installed-bundle verification remains tracked in
 [#60](https://github.com/google/elephant-goldfish-model/issues/60).
 

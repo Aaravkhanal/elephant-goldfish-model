@@ -54,7 +54,10 @@ def test_prepare_exact_archives(release: dict, tmp_path: Path) -> None:
         with zipfile.ZipFile(archive) as bundle:
             assert bundle.testzip() is None
             assert json.loads(bundle.read("plugin.json"))["version"] == version
-    assert commit in (destination / "RELEASE_NOTES.md").read_text()
+    notes = (destination / "RELEASE_NOTES.md").read_text()
+    assert f"Declared source: `{commit}`" in notes
+    assert "Local source identity is caller-supplied and is not verified by this script." in notes
+    assert "Publish only workflow-built candidates after exact-artifact checks." in notes
     with pytest.raises(FileExistsError):
         release["prepare"](ROOT, f"v{version}", destination, commit)
 

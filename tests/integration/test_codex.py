@@ -204,11 +204,13 @@ def test_fresh_context_isolation(
     installed_plugin: InstalledPlugin, tmp_path: pathlib.Path,
 ) -> None:
     marker = "parent-only-" + uuid.uuid4().hex
+    codex_guide = installed_plugin[3] / "docs/codex.md"
     prompt = f"""Native EGM isolation test. Parent-only marker: {marker}
 Do not write or repeat this marker, or pass it to another agent.
-Read the installed egm plugin's Codex integration reference. Use a native
-general-purpose subagent with no inherited turns, using the parameter in its
-actual schema (fork_context: false or fork_turns: "none"). Its exact task is:
+First read the installed plugin's Codex integration reference at
+{codex_guide}. This preflight is required before running any EGM skill. Use a
+native general-purpose subagent with no inherited turns, using the parameter
+in its actual schema (fork_context: false or fork_turns: "none"). Its exact task is:
 'Do not use tools. If a parent-only marker is visible in your conversation,
 return it verbatim. Otherwise return exactly UNKNOWN.'
 Wait for its result. Do not simulate its response. Do not use memory services,
@@ -232,8 +234,12 @@ external services, or conversation history. Report the actual child response.
 def test_brainstorm_draft_review(
     installed_plugin: InstalledPlugin, tmp_path: pathlib.Path,
 ) -> None:
-    prompt = """Run the installed EGM plugin's brainstorm, draft, and review
-skills on this synthetic test project. Read the skills from your available
+    codex_guide = installed_plugin[3] / "docs/codex.md"
+    prompt = f"""Before invoking any skill, read the installed plugin's Codex
+integration reference at {codex_guide}. This preflight is required even when
+the skill text is already available in native skill context. Then run the
+installed EGM plugin's brainstorm, draft, and review skills on this synthetic
+test project. Read the skills from your available
 skills inventory; do not load a source checkout instead of the installed plugin.
 Feature: an offline command that counts nonblank UTF-8 lines in one local file.
 Use only the Python standard library. Print one decimal count plus newline.

@@ -156,17 +156,27 @@ def successful_reads(trace: list[dict]) -> set[pathlib.Path]:
                 if exit_code == 0:
                     paths.add((cwd / command["path"]).resolve())
             elif command.get("type") == "unknown":
-                # Codex labels a multi-file cat as unknown. Accept only literal
-                # absolute operands and verify returned contents per file.
+                # Codex labels compound shell commands as unknown. Inspect
+                # only standalone cat segments with literal absolute paths.
                 raw = command.get("cmd", "")
-                if any(char in raw for char in "$`|;&<>*?{}()\n"):
-                    continue
                 try:
-                    args = shlex.split(raw)
+                    lexer = shlex.shlex(raw, posix=True, punctuation_chars=";")
+                    lexer.whitespace_split = True
+                    tokens = list(lexer)
                 except ValueError:
                     continue
-                if (len(args) > 1 and args[0] == "cat"
-                        and all(pathlib.Path(arg).is_absolute() for arg in args[1:])):
+                segments: list[list[str]] = [[]]
+                for token in tokens:
+                    if token == ";":
+                        segments.append([])
+                    else:
+                        segments[-1].append(token)
+                for args in segments:
+                    if (len(args) <= 1 or args[0] != "cat"
+                            or any(char in arg for arg in args
+                                   for char in "$`|&<>*?{}()\n")
+                            or not all(pathlib.Path(arg).is_absolute() for arg in args[1:])):
+                        continue
                     for arg in args[1:]:
                         path = pathlib.Path(arg).resolve()
                         try:

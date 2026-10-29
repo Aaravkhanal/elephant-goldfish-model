@@ -22,6 +22,15 @@ ROOT = Path(__file__).resolve().parents[2]
             True,
         ),
         (
+            lambda path: {
+                "type": "unknown",
+                "cmd": f"pwd; rg --files -g 'README*' .; cat {path}",
+            },
+            0,
+            "# Installed guide\n" + "guide content " * 20,
+            True,
+        ),
+        (
             lambda path: {"type": "unknown", "cmd": f"cat {path} /missing"},
             1,
             "cat: /missing: No such file or directory\n",
@@ -41,8 +50,8 @@ ROOT = Path(__file__).resolve().parents[2]
         ),
     ],
     ids=(
-        "failed-cat-printed-file", "failed-cat-no-file-output",
-        "failed-read", "successful-read",
+        "failed-cat-printed-file", "compound-cat-printed-file",
+        "failed-cat-no-file-output", "failed-read", "successful-read",
     ),
 )
 def test_successful_reads_requires_native_trace_evidence(

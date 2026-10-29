@@ -302,7 +302,7 @@ def test_published_claude_runtime_is_current(tmp_path: Path) -> None:
 
   assert contents(published) == contents(generated), (
       "Published Claude runtime differs from generated output. Regenerate "
-      "with `python scripts/pack_plugin.py --target claude --output "
-      "<output-dir>`; copy the generated `egm-claude` folder contents into "
-      "`distributions/claude`."
+      "with `python3 scripts/pack_plugin.py --target claude --output "
+      "<output-dir>`; replace `distributions/claude` with the generated "
+      "`egm-claude` folder."
   )

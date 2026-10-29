@@ -98,7 +98,7 @@ archive and `SHA256SUMS` from the same GitHub release, verify the checksum, then
 run the same suite with the archive path:
 
 ```sh
-shasum -a 256 -c SHA256SUMS
+shasum -a 256 -c --ignore-missing SHA256SUMS
 EGM_CODEX_RELEASE_ZIP=/absolute/path/to/egm-openai-0.1.0.zip \
   EGM_CODEX_LIVE=1 pytest tests/integration/test_codex.py -v
 ```

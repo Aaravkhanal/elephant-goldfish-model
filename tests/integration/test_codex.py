@@ -46,17 +46,16 @@ def installed_plugin(
         with zipfile.ZipFile(release_zip) as bundle:
             assert bundle.testzip() is None, "Release ZIP is corrupt"
             bundle.extractall(source)
-        marketplace = json.loads(
-            (repo_root / ".agents/plugins/marketplace.json").read_text()
-        )
     else:
         shutil.copytree(
             repo_root, source, dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(
                 ".git", ".venv", "__pycache__", "node_modules"),
         )
-        marketplace_file = source / ".agents/plugins/marketplace.json"
-        marketplace = json.loads(marketplace_file.read_text())
+    # The OpenAI ZIP omits the marketplace file; use the checked-in metadata for both.
+    marketplace = json.loads(
+        (repo_root / ".agents/plugins/marketplace.json").read_text()
+    )
     marketplace_file = source / ".agents/plugins/marketplace.json"
     marketplace_file.parent.mkdir(parents=True, exist_ok=True)
     name = "egm-test-" + uuid.uuid4().hex[:12]
@@ -257,16 +256,13 @@ are unavailable. Keep the fixture small and reviews concise.
     trace = run_codex(installed_plugin, tmp_path, prompt)
     root = installed_plugin[3]
     required_reads = {root / "docs/codex.md"}
-    available_skills = {
-        path.name.replace("_", "-") for path in (root / "skills").iterdir()
-        if path.is_dir()
-    }
-    assert {"egm-brainstorm", "egm-draft", "egm-review"} <= available_skills
+    # v0.1.0 uses underscores; current source skill names use hyphens.
     skill_dirs = {
         path.name.replace("_", "-"): path
         for path in (root / "skills").iterdir()
         if path.is_dir()
     }
+    assert {"egm-brainstorm", "egm-draft", "egm-review"} <= skill_dirs.keys()
     required_reads.update(
         skill_dirs[skill] / "SKILL.md"
         for skill in ("egm-brainstorm", "egm-draft", "egm-review")

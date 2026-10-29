@@ -232,16 +232,15 @@ def test_fresh_context_isolation(
     marker = "parent-only-" + uuid.uuid4().hex
     prompt = f"""Native EGM isolation test. Parent-only marker: {marker}
 Do not write or repeat this marker, or pass it to another agent.
-Read the installed egm plugin's Codex integration reference. Use a native
-general-purpose subagent with no inherited turns, using the parameter in its
-actual schema (fork_context: false or fork_turns: "none"). Its exact task is:
+Use a native general-purpose subagent with no inherited turns, using the
+parameter in its actual schema (fork_context: false or fork_turns: "none").
+Its exact task is:
 'Do not use tools. If a parent-only marker is visible in your conversation,
 return it verbatim. Otherwise return exactly UNKNOWN.'
 Wait for its result. Do not simulate its response. Do not use memory services,
 external services, or conversation history. Report the actual child response.
 """
     trace = run_codex(installed_plugin, tmp_path, prompt)
-    assert installed_plugin[3] / "docs/codex.md" in successful_reads(trace)
     assert_isolated_spawns(trace)
     children = child_traces(trace)
     assert len(children) == 1
@@ -284,7 +283,6 @@ are unavailable. Keep the fixture small and reviews concise.
 """
     trace = run_codex(installed_plugin, tmp_path, prompt)
     root = installed_plugin[3]
-    required_reads = {root / "docs/codex.md"}
     # v0.1.0 uses underscores; current source skill names use hyphens.
     skill_dirs = {
         path.name.replace("_", "-"): path
@@ -292,12 +290,11 @@ are unavailable. Keep the fixture small and reviews concise.
         if path.is_dir()
     }
     assert {"egm-brainstorm", "egm-draft", "egm-review"} <= skill_dirs.keys()
-    required_reads.update(
+    required_skill_reads = {
         skill_dirs[skill] / "SKILL.md"
         for skill in ("egm-brainstorm", "egm-draft", "egm-review")
-    )
+    }
     reads = successful_reads(trace)
-    required_skill_reads = required_reads - {root / "docs/codex.md"}
     assert required_skill_reads <= reads, "Installed skills not read"
     assert root / "docs/codex.md" in reads, "Codex reference not read"
     for name in ("concepts_brief.md", "design_draft.md", "docs/designs/line-count.md"):

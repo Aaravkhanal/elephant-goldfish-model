@@ -46,11 +46,9 @@ def installed_plugin(
         with zipfile.ZipFile(release_zip) as bundle:
             assert bundle.testzip() is None, "Release ZIP is corrupt"
             bundle.extractall(source)
-        marketplace = {
-            "name": "egm",
-            "interface": {"displayName": "Elephant-Goldfish Model"},
-            "plugins": [{"name": "egm", "source": "./"}],
-        }
+        marketplace = json.loads(
+            (repo_root / ".agents/plugins/marketplace.json").read_text()
+        )
     else:
         shutil.copytree(
             repo_root, source, dirs_exist_ok=True,
@@ -270,9 +268,16 @@ are unavailable. Keep the fixture small and reviews concise.
         if path.is_dir()
     }
     assert {"egm-brainstorm", "egm-draft", "egm-review"} <= available_skills
-    # Codex exposes the skill definitions through its native skill context, but
-    # the workflow still must read the installed host integration reference.
-    assert required_reads <= successful_reads(trace), "Codex reference not read"
+    skill_dirs = {
+        path.name.replace("_", "-"): path
+        for path in (root / "skills").iterdir()
+        if path.is_dir()
+    }
+    required_reads.update(
+        skill_dirs[skill] / "SKILL.md"
+        for skill in ("egm-brainstorm", "egm-draft", "egm-review")
+    )
+    assert required_reads <= successful_reads(trace), "Installed skills not read"
     for name in ("concepts_brief.md", "design_draft.md", "docs/designs/line-count.md"):
         artifact = tmp_path / name
         assert artifact.is_file(), f"Missing workflow artifact: {name}"

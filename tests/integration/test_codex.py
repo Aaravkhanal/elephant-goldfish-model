@@ -10,6 +10,7 @@ import shutil
 import shlex
 import subprocess
 import uuid
+import zipfile
 from collections.abc import Iterator
 from urllib.parse import unquote, urlparse
 
@@ -40,10 +41,26 @@ def installed_plugin(
     """Install the candidate through Codex without replacing the user's EGM."""
     assert shutil.which("codex"), "Codex CLI is required for live tests"
     source = tmp_path_factory.mktemp("egm-marketplace")
-    shutil.copytree(repo_root, source, dirs_exist_ok=True, ignore=shutil.ignore_patterns(
-        ".git", ".venv", "__pycache__", "node_modules"))
+    release_zip = os.environ.get("EGM_CODEX_RELEASE_ZIP")
+    if release_zip:
+        with zipfile.ZipFile(release_zip) as bundle:
+            assert bundle.testzip() is None, "Release ZIP is corrupt"
+            bundle.extractall(source)
+        marketplace = {
+            "name": "egm",
+            "interface": {"displayName": "Elephant-Goldfish Model"},
+            "plugins": [{"name": "egm", "source": "./"}],
+        }
+    else:
+        shutil.copytree(
+            repo_root, source, dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns(
+                ".git", ".venv", "__pycache__", "node_modules"),
+        )
+        marketplace_file = source / ".agents/plugins/marketplace.json"
+        marketplace = json.loads(marketplace_file.read_text())
     marketplace_file = source / ".agents/plugins/marketplace.json"
-    marketplace = json.loads(marketplace_file.read_text())
+    marketplace_file.parent.mkdir(parents=True, exist_ok=True)
     name = "egm-test-" + uuid.uuid4().hex[:12]
     marketplace["name"] = name
     marketplace_file.write_text(json.dumps(marketplace))
@@ -52,6 +69,16 @@ def installed_plugin(
         cli("marketplace", "add", str(source))
         result = cli("add", selector)
         root = pathlib.Path(result["installedPath"])
+        if release_zip:
+            with zipfile.ZipFile(release_zip) as bundle:
+                for relative in bundle.namelist():
+                    installed = root / relative
+                    assert installed.is_file(), (
+                        f"Release file missing from installation: {relative}"
+                    )
+                    assert installed.read_bytes() == bundle.read(relative), (
+                        f"Installed file differs from release ZIP: {relative}"
+                    )
         yield selector, name, source, root
     finally:
         subprocess.run(["codex", "plugin", "remove", selector], check=False)
@@ -232,10 +259,14 @@ are unavailable. Keep the fixture small and reviews concise.
     trace = run_codex(installed_plugin, tmp_path, prompt)
     root = installed_plugin[3]
     required_reads = {root / "docs/codex.md"}
-    required_reads.update(root / "skills" / skill / "SKILL.md" for skill in (
-        "egm-brainstorm", "egm-draft", "egm-review",
-    ))
-    assert required_reads <= successful_reads(trace), "Installed skills not read"
+    available_skills = {
+        path.name.replace("_", "-") for path in (root / "skills").iterdir()
+        if path.is_dir()
+    }
+    assert {"egm-brainstorm", "egm-draft", "egm-review"} <= available_skills
+    # Codex exposes the skill definitions through its native skill context, but
+    # the workflow still must read the installed host integration reference.
+    assert required_reads <= successful_reads(trace), "Codex reference not read"
     for name in ("concepts_brief.md", "design_draft.md", "docs/designs/line-count.md"):
         artifact = tmp_path / name
         assert artifact.is_file(), f"Missing workflow artifact: {name}"

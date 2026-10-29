@@ -134,26 +134,55 @@ def successful_reads(trace: list[dict]) -> set[pathlib.Path]:
     """Inspect executed file reads, not filenames mentioned by the model."""
     paths = set()
     for event in trace:
-        item = event.get("payload", {}).get("item", {})
-        if (item.get("type") != "CommandExecution"
-                or item.get("status") != "completed"
-                or item.get("exit_code") != 0
-                or not (item.get("aggregated_output") or item.get("stdout"))):
+        # Codex trace event names differ between CLI versions.
+        item = event.get("payload", {}).get("item", event.get("item", {}))
+        if item.get("type", "").replace("_", "").lower() != "commandexecution":
             continue
-        cwd = pathlib.Path(unquote(urlparse(item["cwd"]).path))
-        for command in item.get("parsed_cmd", []):
+        output = item.get("aggregated_output") or item.get("stdout") or ""
+        if not output:
+            continue
+        status = item.get("status", "").lower()
+        exit_code = item.get("exit_code")
+        # A compound `cat` can return useful file contents and then fail on a
+        # later missing operand. Count a file only when its own contents are
+        # visibly present in the captured output.
+        completed = status in {"completed", "failed"} or event.get("type") == "item.completed"
+        if not completed:
+            continue
+        cwd_value = item.get("cwd") or ""
+        cwd = pathlib.Path(unquote(urlparse(cwd_value).path)) if cwd_value else pathlib.Path.cwd()
+        commands = item.get("parsed_cmd", [])
+        if not commands and item.get("command"):
+            raw = item["command"]
+            try:
+                wrapper = shlex.split(raw)
+                raw = wrapper[2] if len(wrapper) > 2 and wrapper[1] == "-lc" else raw
+                args = shlex.split(raw)
+            except ValueError:
+                args = []
+            commands = [{"type": "unknown", "cmd": raw}] if args else []
+        for command in commands:
             if command.get("type") == "read" and command.get("path"):
-                paths.add((cwd / command["path"]).resolve())
+                if exit_code == 0:
+                    paths.add((cwd / command["path"]).resolve())
             elif command.get("type") == "unknown":
                 # Codex labels a multi-file cat as unknown. Accept only literal
-                # absolute operands, never shell expansion or composed commands.
+                # absolute operands and verify returned contents per file.
                 raw = command.get("cmd", "")
                 if any(char in raw for char in "$`|;&<>*?{}()\n"):
                     continue
                 args = shlex.split(raw)
                 if (len(args) > 1 and args[0] == "cat"
                         and all(pathlib.Path(arg).is_absolute() for arg in args[1:])):
-                    paths.update(pathlib.Path(arg).resolve() for arg in args[1:])
+                    for arg in args[1:]:
+                        path = pathlib.Path(arg).resolve()
+                        try:
+                            contents = path.read_text(encoding="utf-8")
+                        except (OSError, UnicodeError):
+                            continue
+                        evidence = contents[: min(200, len(contents))]
+                        if evidence and evidence in output:
+                            paths.add(path)
     return paths
 
 

@@ -134,34 +134,24 @@ def successful_reads(trace: list[dict]) -> set[pathlib.Path]:
     """Inspect executed file reads, not filenames mentioned by the model."""
     paths = set()
     for event in trace:
-        # Codex trace event names differ between CLI versions.
-        item = event.get("payload", {}).get("item", event.get("item", {}))
-        if item.get("type", "").replace("_", "").lower() != "commandexecution":
+        if (event.get("type") != "event_msg"
+                or event.get("payload", {}).get("type") != "item_completed"):
             continue
-        output = item.get("aggregated_output") or item.get("stdout") or ""
-        if not output:
+        item = event["payload"].get("item", {})
+        if (item.get("type") != "CommandExecution"
+                or item.get("status") not in {"completed", "failed"}
+                or not item.get("aggregated_output")):
             continue
-        status = item.get("status", "").lower()
+        output = item["aggregated_output"]
         exit_code = item.get("exit_code")
         # A compound `cat` can return useful file contents and then fail on a
         # later missing operand. Count a file only when its own contents are
         # visibly present in the captured output.
-        completed = status in {"completed", "failed"} or event.get("type") == "item.completed"
-        if not completed:
+        cwd_value = item.get("cwd")
+        if not cwd_value:
             continue
-        cwd_value = item.get("cwd") or ""
-        cwd = pathlib.Path(unquote(urlparse(cwd_value).path)) if cwd_value else pathlib.Path.cwd()
-        commands = item.get("parsed_cmd", [])
-        if not commands and item.get("command"):
-            raw = item["command"]
-            try:
-                wrapper = shlex.split(raw)
-                raw = wrapper[2] if len(wrapper) > 2 and wrapper[1] == "-lc" else raw
-                args = shlex.split(raw)
-            except ValueError:
-                args = []
-            commands = [{"type": "unknown", "cmd": raw}] if args else []
-        for command in commands:
+        cwd = pathlib.Path(unquote(urlparse(cwd_value).path))
+        for command in item.get("parsed_cmd", []):
             if command.get("type") == "read" and command.get("path"):
                 if exit_code == 0:
                     paths.add((cwd / command["path"]).resolve())
@@ -171,7 +161,10 @@ def successful_reads(trace: list[dict]) -> set[pathlib.Path]:
                 raw = command.get("cmd", "")
                 if any(char in raw for char in "$`|;&<>*?{}()\n"):
                     continue
-                args = shlex.split(raw)
+                try:
+                    args = shlex.split(raw)
+                except ValueError:
+                    continue
                 if (len(args) > 1 and args[0] == "cat"
                         and all(pathlib.Path(arg).is_absolute() for arg in args[1:])):
                     for arg in args[1:]:

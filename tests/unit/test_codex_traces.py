@@ -31,6 +31,24 @@ ROOT = Path(__file__).resolve().parents[2]
             True,
         ),
         (
+            lambda path: {
+                "type": "unknown",
+                "cmd": f"cd {Path(path).parent} && cat {path}",
+            },
+            0,
+            "# Installed guide\n" + "guide content " * 20,
+            False,
+        ),
+        (
+            lambda path: {
+                "type": "unknown",
+                "cmd": f"cat {path} | head",
+            },
+            0,
+            "# Installed guide\n" + "guide content " * 20,
+            False,
+        ),
+        (
             lambda path: {"type": "unknown", "cmd": f"cat {path} /missing"},
             1,
             "cat: /missing: No such file or directory\n",
@@ -51,6 +69,7 @@ ROOT = Path(__file__).resolve().parents[2]
     ],
     ids=(
         "failed-cat-printed-file", "compound-cat-printed-file",
+        "and-separated-cat-rejected", "piped-cat-rejected",
         "failed-cat-no-file-output", "failed-read", "successful-read",
     ),
 )

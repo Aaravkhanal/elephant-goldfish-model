@@ -174,7 +174,7 @@ def successful_reads(trace: list[dict]) -> set[pathlib.Path]:
                 for args in segments:
                     if (len(args) <= 1 or args[0] != "cat"
                             or any(char in arg for arg in args
-                                   for char in "$`|&<>*?{}()\n")
+                                   for char in "$`|&<>*?{}()")
                             or not all(pathlib.Path(arg).is_absolute() for arg in args[1:])):
                         continue
                     for arg in args[1:]:
@@ -183,7 +183,7 @@ def successful_reads(trace: list[dict]) -> set[pathlib.Path]:
                             contents = path.read_text(encoding="utf-8")
                         except (OSError, UnicodeError):
                             continue
-                        evidence = contents[: min(200, len(contents))]
+                        evidence = contents[:200]
                         if evidence and evidence in output:
                             paths.add(path)
     return paths

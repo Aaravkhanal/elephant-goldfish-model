@@ -16,7 +16,11 @@ ROOT = Path(__file__).resolve().parents[2]
     ("parsed_command", "exit_code", "output", "expected"),
     [
         (
-            lambda path: {"type": "unknown", "cmd": f"cat {shlex.quote(path)} /missing"},
+            lambda path: {
+                "type": "unknown",
+                "cmd": f"cat {shlex.quote(path)} "
+                       f"{shlex.quote(str(Path(path).with_name('missing')))}",
+            },
             1,
             "# Installed guide\n" + "guide content " * 20,
             True,
@@ -49,7 +53,11 @@ ROOT = Path(__file__).resolve().parents[2]
             False,
         ),
         (
-            lambda path: {"type": "unknown", "cmd": f"cat {shlex.quote(path)} /missing"},
+            lambda path: {
+                "type": "unknown",
+                "cmd": f"cat {shlex.quote(path)} "
+                       f"{shlex.quote(str(Path(path).with_name('missing')))}",
+            },
             1,
             "cat: /missing: No such file or directory\n",
             False,

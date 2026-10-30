@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
     ("parsed_command", "exit_code", "output", "expected"),
     [
         (
-            lambda path: {"type": "unknown", "cmd": f"cat {path} /missing"},
+            lambda path: {"type": "unknown", "cmd": f"cat {shlex.quote(path)} /missing"},
             1,
             "# Installed guide\n" + "guide content " * 20,
             True,
@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
         (
             lambda path: {
                 "type": "unknown",
-                "cmd": f"pwd; rg --files -g 'README*' .; cat {path}",
+                "cmd": f"pwd; rg --files -g 'README*' .; cat {shlex.quote(path)}",
             },
             0,
             "# Installed guide\n" + "guide content " * 20,
@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[2]
         (
             lambda path: {
                 "type": "unknown",
-                "cmd": f"cd {Path(path).parent} && cat {path}",
+                "cmd": f"cd {shlex.quote(str(Path(path).parent))} && cat {shlex.quote(path)}",
             },
             0,
             "# Installed guide\n" + "guide content " * 20,
@@ -42,14 +42,14 @@ ROOT = Path(__file__).resolve().parents[2]
         (
             lambda path: {
                 "type": "unknown",
-                "cmd": f"cat {path} | head",
+                "cmd": f"cat {shlex.quote(path)} | head",
             },
             0,
             "# Installed guide\n" + "guide content " * 20,
             False,
         ),
         (
-            lambda path: {"type": "unknown", "cmd": f"cat {path} /missing"},
+            lambda path: {"type": "unknown", "cmd": f"cat {shlex.quote(path)} /missing"},
             1,
             "cat: /missing: No such file or directory\n",
             False,
@@ -83,7 +83,7 @@ def test_successful_reads_requires_native_trace_evidence(
     guide = tmp_path / "docs" / "codex.md"
     guide.parent.mkdir()
     guide.write_text("# Installed guide\n" + "guide content " * 20)
-    command = parsed_command(shlex.quote(str(guide)))
+    command = parsed_command(str(guide))
     trace = [{
         "type": "event_msg",
         "payload": {
@@ -100,4 +100,3 @@ def test_successful_reads_requires_native_trace_evidence(
     }]
 
     assert (guide.resolve() in successful_reads(trace)) is expected
-
